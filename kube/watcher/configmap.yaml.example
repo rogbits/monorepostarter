@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: watcher
+  annotations:
+    dir: ABSOLUTE_PATH_FOR_REPO_ROOT_DIR
+data:

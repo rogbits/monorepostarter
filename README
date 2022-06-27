@@ -1,0 +1,69 @@
+starter example for a local monorepo setup,
+running services in a local kube cluster,
+with a lightweight hot reload utility
+
+requirements for local bootstrapping
+------------------------------------
+- Docker for building the service containers
+- Access to a sandbox kube cluster + kubectl,
+  development happened on a 1.24 local cluster in docker-desktop.
+- mocha for a unit test runner
+
+repo config
+-----------
+before bootstrap, you will need to configure the repo:
+- cp the config file: kube/watcher/configmap.yaml.example
+- replace the ABSOLUTE_PATH_FOR_REPO_ROOT_DIR placeholder.
+
+this setting will be pushed to all the service containers during creation,
+so that your host code directories can be bound to the containers during development.
+
+bootstrapping
+-------------
+- docker compose -- build to build the containers
+- kubectl apply -k kube/nginx to install ingress-nginx
+- kubectl kustomize --load-restrictor LoadRestrictionsNone kube/_dev | kubectl apply -f -
+
+These steps will:
+- build the service containers from the docker-compose.yaml
+- install the ingress-nginx controller objects into the cluster
+  under the ingress-nginx namespace; nginx will be acting as our edge device
+- load the kube resources related to the stack services into the cluster
+  under the moz namespace
+
+Once everything spins up and reaches the desired state, port 80 and 443 should
+be open locally pointing to nginx.  To test the endpoints
+- curl -H "backend-host: hello" localhost/hello-safe
+- curl localhost/hello-unsafe
+
+kustomize load-restrictor flag
+------------------------------
+The kustomize designers seem to be leaning on a specific directory structure
+which in personal xp has resulted in more nested, duplicated directories,
+resulting in less spacial locality amongst related files.
+
+A --load-restrictor flag is available that can take a LoadRestrictionsNone value,
+removing the constraint, and producing a flatter and simpler overall tree for the
+infra definitions.
+
+more about the repo
+-------------------
+Each service sits in a top level directory, along with language-specific
+library directories also rooted at the top level, and used for shared code.
+
+Referencing library code is relative to the overall project tree, allowing for
+easier jumps in an IDE and treating shared code as if it were local to the
+service under development.
+
+Specific libraries relevant to a service can be referenced in the service's Dockerfile,
+which will include them at build time, respecting their existing paths in the directory
+structure of the repo.
+
+Services also include _cicd directories, which can be used for automation when
+respecting conventions, and offering a sort of inversion of control to developers
+that oversee specific services, by generalizing steps normally used in CICD pipelines.
+Combined with the git history, the repo can include functionality to automate
+deployment related pipelines as well, and build those pipelines dynamically.
+
+additional mechanisms would need to be implemented to fully flesh out
+what's possible.

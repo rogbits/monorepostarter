@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  hello:
+    build:
+      context: .
+      dockerfile: hello/Dockerfile
+
+  proxy:
+    build:
+      context: .
+      dockerfile: proxy/Dockerfile
+
+  watcher:
+    build:
+      context: .
+      dockerfile: watcher/Dockerfile

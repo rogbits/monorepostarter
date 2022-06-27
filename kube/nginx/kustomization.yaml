@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ingress-nginx
+resources:
+  - ./namespace.yaml
+
+  - ./ingress-nginx/serviceAccount.yaml
+  - ./ingress-nginx/role.yaml
+  - ./ingress-nginx/clusterRole.yaml
+  - ./ingress-nginx/roleBinding.yaml
+  - ./ingress-nginx/clusterRoleBinding.yaml
+  - ./ingress-nginx/configMap.yaml
+  - ./ingress-nginx/service.yaml
+  - ./ingress-nginx/deployment.yaml
+  - ./ingress-nginx/ingressClass.yaml
+
+  - ./ingress-nginx-admission/serviceAccount.yaml
+  - ./ingress-nginx-admission/role.yaml
+  - ./ingress-nginx-admission/clusterRole.yaml
+  - ./ingress-nginx-admission/roleBinding.yaml
+  - ./ingress-nginx-admission/clusterRoleBinding.yaml
+  - ./ingress-nginx-admission/service.yaml
+  - ./ingress-nginx-admission/job1.yaml
+  - ./ingress-nginx-admission/job2.yaml
+  - ./ingress-nginx-admission/validatingWebhookConfig.yaml

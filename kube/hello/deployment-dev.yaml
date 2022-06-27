@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello
+  annotations:
+    watchDirs: hello _jslib/server _jslib/logger
+spec:
+  template:
+    spec:
+      serviceAccountName: watcher
+      containers:
+        - name: hello
+          command:
+            - node
+            - ../_jslib/restarter
+          volumeMounts:
+            - name: app
+              mountPath: /app/hello
+            - name: liblogger
+              mountPath: /app/_jslib/logger
+            - name: libserver
+              mountPath: /app/_jslib/server
+            - name: librestarter
+              mountPath: /app/_jslib/restarter
+        - name: watcher
+          image: moz_watcher
+          imagePullPolicy: Never
+          volumeMounts:
+            - name: app
+              mountPath: /app/hello
+            - name: watcher
+              mountPath: /app/watcher
+            - name: liblogger
+              mountPath: /app/_jslib/logger
+            - name: libserver
+              mountPath: /app/_jslib/server
+      volumes:
+        - name: app
+          hostPath:
+            path: REPO_DIR/hello
+        - name: watcher
+          hostPath:
+            path: REPO_DIR/watcher
+        - name: liblogger
+          hostPath:
+            path: REPO_DIR/_jslib/logger
+        - name: libserver
+          hostPath:
+            path: REPO_DIR/_jslib/server
+        - name: librestarter
+          hostPath:
+            path: REPO_DIR/_jslib/restarter

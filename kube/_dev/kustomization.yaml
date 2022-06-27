@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: moz
+resources:
+  - ./namespace.yaml
+
+  - ../hello/deployment.yaml
+  - ../hello/service.yaml
+  - ../hello/ingress.yaml
+
+  - ../proxy/deployment.yaml
+  - ../proxy/service.yaml
+  - ../proxy/ingress.yaml
+
+  - ../watcher/configmap.yaml
+  - ../watcher/role.yaml
+  - ../watcher/rolebinding.yaml
+  - ../watcher/sa.yaml
+patchesStrategicMerge:
+  - ../hello/deployment-dev.yaml
+  - ../proxy/deployment-dev.yaml
+
+replacements:
+  - source:
+      kind: ConfigMap
+      version: v1
+      name: watcher
+      fieldPath: metadata.annotations.dir
+    targets:
+      - select:
+          kind: Deployment
+          namespace: moz
+          group: apps
+          version: v1
+        fieldPaths:
+          - spec.template.spec.volumes.*.hostPath.path
+        options:
+          delimiter: /
+          index: 0
